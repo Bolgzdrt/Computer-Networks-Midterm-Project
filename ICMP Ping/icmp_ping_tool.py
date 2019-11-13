@@ -1,8 +1,10 @@
-from socket import *
+import socket
 import time
 import select
 import struct
 import os
+import sys
+import binascii
 
 def createChecksum(str_):
     str_ = bytearray(str_)
@@ -56,17 +58,17 @@ def sendPing(my_socket, dest_addr, ID):
     my_checksum = createChecksum(header + data)
 
     if sys.platform == 'darwin':
-        my_checksum = htons(my_checksum) & 0xffff
+        my_checksum = socket.htons(my_checksum) & 0xffff
     else:
-        my_checksum = htons(my_checksum)
+        my_checksum = socket.htons(my_checksum)
 
     header = struct.pack("bbHHh", 8, 0, my_checksum, ID, 1)
     packet = header + data
     my_socket.sendto(packet, (dest_addr, 1))
 
 def doPing(dest_addr, timeout):
-    icmp = getprotobyname("icmp")
-    my_socket = socket(AF_INET, SOCK_DGRAM, icmp)
+    icmp = socket.getprotobyname("icmp")
+    my_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, icmp)
 
     my_ID = os.getpid() & 0xFFFF
     sendPing(my_socket, dest_addr, my_ID)
@@ -76,7 +78,7 @@ def doPing(dest_addr, timeout):
     return delay
 
 def ping (host, timeout=1):
-    dest = gethostbyname(host)
+    dest = socket.gethostbyname(host)
     print("Pinging " + dest + ":\n")
 
     while 1:
