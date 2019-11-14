@@ -1,26 +1,28 @@
-from socket import *
 import smtplib
+import ssl
 
-email_content = "This python program is working!"
+port = 465      # gmail's SSL port for their SMTP server
 
-email_server = ("smtp.gmail.com", 465)
+# sender email credentials
+from_email = "compnettest345@gmail.com"
+password = "f#%$7bx%1RLd"
 
-# TCP socket creation
-mailSocket = socket(AF_INET, SOCK_STREAM)
-mailSocket.connect(email_server)
+to_email = "robbob345@gmail.com"
+email_body = """\
+Subject: This was sent using python
 
-returnMsg = mailSocket.recv(1024)
-if returnMsg[:3] != "220":
-    print("Server did not reply")
-else:
-    print("Connection request: " + returnMsg)
+Hello,
 
-# HELO command to initialize SMTP conversation
-heloContent = "HELO smtp.gmail.com"
-mailSocket.send(heloContent.encode())
-returnMsg = mailSocket.recv(1024)
-if returnMsg[:3] != "250":
-    print("Server did not reply")
-else:
-    print(returnMsg)
+This is the first assignment option on Computer Networks Midterm 2.
 
+-Robert"""
+
+# returns object with settings for server authentication using SSl, necessary
+# for gmail SMTP connection
+context = ssl.create_default_context()
+
+# with statement ensures socket is destroyed after completion of internal statements
+# SMTP_SSL encapsulates an SMTP connection, which uses TCP, with the settings necessary for SSL
+with smtplib.SMTP_SSL("smtp.gmail.com", port, context=context) as server:
+    server.login(from_email, password)      # uses sender credentials to establish connection to SMTP server
+    server.sendmail(from_email, to_email, email_body)       # sends the email
