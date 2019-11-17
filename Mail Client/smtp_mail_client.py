@@ -25,4 +25,8 @@ context = ssl.create_default_context()
 # SMTP_SSL encapsulates an SMTP connection, which uses TCP, with the settings necessary for SSL
 with smtplib.SMTP_SSL("smtp.gmail.com", port, context=context) as server:
     server.login(from_email, password)      # uses sender credentials to establish connection to SMTP server
+    print("Sending this email: \n")
+    print("To: ", to_email)
+    print("From: ", from_email)
+    print(email_body)
     server.sendmail(from_email, to_email, email_body)       # sends the email
